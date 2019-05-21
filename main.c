@@ -6,47 +6,26 @@ typedef struct {
     int chave;
 }item;
 
-typedef struct nozin *Ponteiro;
+typedef struct Noarvore *Ponteiro;
 
-typedef struct nozin{
+typedef struct Noarvore{
     item elemento;
-    Ponteiro esquerda;
     Ponteiro direita;
-}nozin;
+    Ponteiro esquerda;
+    int altura;
+}Noarvore;
 
-bool inicia_arvore(Ponteiro *arvore) {
+void inicia_arvore(Ponteiro *arvore){
     (*arvore) = NULL;
-}
 
+}
 bool esta_vazia(Ponteiro *arvore){
-    if((*arvore) == NULL){
+    if((*arvore)==NULL){
         return true;
-
-    }
-}
-
-bool inserir(Ponteiro *arvore, item elemento){
-
-    if((*arvore) == NULL){
-        (*arvore) = malloc(sizeof(nozin));
-        (*arvore)->elemento = elemento;
-        (*arvore)->direita = (*arvore)->esquerda = NULL;
-//        printf("%d\n", (*arvore)->elemento.chave);
-        return true;
-    }
-
-    if((*arvore)->elemento.chave == elemento.chave){
+    } else{
         return false;
     }
-    if((*arvore)->elemento.chave > elemento.chave){
-        return inserir(&(*arvore)->esquerda, elemento);
-    }
-    else{
-        return inserir(&(*arvore)->direita, elemento);
-    }
-
 }
-
 void Pre_ordem(Ponteiro *arvore){
     if(*arvore == NULL)
         return;
@@ -68,53 +47,115 @@ void Em_ordem(Ponteiro *arvore){
     printf("%d\n", (*arvore)->elemento.chave);
     Em_ordem(&(*arvore)->direita);
 }
-bool Procura(Ponteiro *arvore, int elemento, item *porra){
+int altura_arvore(Ponteiro *arvore){
     if((*arvore)== NULL){
-        return false;
+        return 0;
+    }else{
+        return (*arvore)->altura;
     }
-    if((*arvore)->elemento.chave == elemento){
-        *porra= (*arvore)->elemento;
+
+
+}
+int atualiza_altura(Ponteiro *arvore){
+    int AD=0,AE=0;
+    AE= altura_arvore(&(*arvore)->esquerda);
+    AD= altura_arvore(&(*arvore)->direita);
+    if(AE>AD){
+        return AE+1;
+    }else{
+        return AD+1;
+    }
+}
+
+void simples_esquerda(Ponteiro *arvore){
+    Ponteiro u;
+    u=(*arvore)->direita;
+    (*arvore)->direita=u->esquerda;
+    u->esquerda=(*arvore);
+    (*arvore)->altura=0;
+    (*arvore)=u;
+}
+void simples_direita(Ponteiro *arvore){
+    Ponteiro u;
+    u=(*arvore)->direita;
+    (*arvore)->esquerda=u->direita;
+    u->direita=(*arvore);
+    (*arvore)->altura=0;
+    (*arvore)=u;
+}
+
+void dupla_esquerda(Ponteiro *arvore){
+    Ponteiro u,v;
+    u=(*arvore)->direita;
+    v=u->esquerda;
+    (*arvore)->esquerda=v->direita;
+    u->esquerda=v->direita;
+    v->direita=u;
+    v->esquerda=(*arvore);
+    (*arvore)=v;
+    v->altura=atualiza_altura(&(*arvore));
+    u->altura=atualiza_altura(&(*arvore));
+}
+
+void dupla_direita(Ponteiro *arvore){
+    Ponteiro u,v;
+    u=(*arvore)->esquerda;
+    v=u->direita;
+    u->direita=v->esquerda;
+    v->esquerda=u;
+    (*arvore)->esquerda = v->direita;
+    v->direita =(*arvore);
+    (*arvore)=v;
+    v->altura=atualiza_altura(&(*arvore));
+    u->altura=atualiza_altura(&(*arvore));
+
+}
+
+
+
+
+bool Aplicar_rotacao(Ponteiro *arvore){
+    
+
+
+}
+
+bool inserir(Ponteiro *arvore, item elemento){
+    if(esta_vazia(&(*arvore))== true){
+        (*arvore)= malloc(sizeof(Noarvore));
+        (*arvore)->elemento= elemento;
+        (*arvore)->esquerda=NULL;
+        (*arvore)->direita=NULL;
+        (*arvore)->altura=0;
         return true;
     }
-    if((*arvore)->elemento.chave >elemento){
-        return Procura(&(*arvore)->esquerda, elemento, porra);
+    bool deucerto;
+    if(elemento.chave == (*arvore)->elemento.chave){
+        return false;
     }
-        else{
-            return Procura(&(*arvore)->direita, elemento, porra);
-        }
+    if(elemento.chave > (*arvore)->elemento.chave){
+        deucerto= inserir(&(*arvore)->direita, elemento);
+    }else{
+        deucerto=inserir(&(*arvore)->esquerda, elemento);
+    }
+    if(deucerto==false){
+        return false;
+    }else{
+        Aplicar_rotacao(&(*arvore));
+    }
+    atualiza_altura();
+
 
 }
 
-bool remove(Ponteiro *arvore, item elemento) {
-    if(Procura(&(*arvore), elemento.chave) == true){
 
-    }
-}
+
+
+
 
 
 
 int main() {
-    Ponteiro raiz;
-    item X;
-    inicia_arvore(&raiz);
-    X.chave=10;
-    inserir(&raiz, X);
-    X.chave= 20;
-    inserir(&raiz, X);
-    X.chave=4;
-    inserir(&raiz, X);
-    X.chave =3;
-    inserir(&raiz, X);
-    X.chave =15;
-    inserir(&raiz, X);
-    X.chave =22;
-    inserir(&raiz, X);
-    X.chave =5;
-    inserir(&raiz, X);
-    Em_ordem(&raiz);
-
-
-
 
     return 0;
 }
